@@ -13,7 +13,7 @@ async def test_process_event_integration_created_from_pubsub(
         pubsub_message_request_headers, integration_created_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",
@@ -31,7 +31,7 @@ async def test_process_event_integration_updated_from_pubsub(
         pubsub_message_request_headers, integration_updated_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",
@@ -50,7 +50,7 @@ async def test_process_event_integration_deleted_from_pubsub(
         pubsub_message_request_headers, integration_deleted_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",
@@ -68,7 +68,7 @@ async def test_process_event_action_config_created_from_pubsub(
         pubsub_message_request_headers, action_config_created_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",
@@ -86,7 +86,7 @@ async def test_process_event_action_config_updated_from_pubsub(
         pubsub_message_request_headers, action_config_updated_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",
@@ -105,7 +105,7 @@ async def test_process_event_action_config_deleted_from_pubsub(
         pubsub_message_request_headers, action_config_deleted_event_as_pubsub_message
 ):
 
-    mocker.patch("app.services.config_events_consumer.config_manager", mock_config_manager)
+    mocker.patch("gundi_action_runner.services.config_events_consumer.config_manager", mock_config_manager)
 
     response = api_client.post(
         "/config-events/",

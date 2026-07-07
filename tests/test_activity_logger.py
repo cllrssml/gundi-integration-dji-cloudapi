@@ -10,9 +10,9 @@ from gundi_core.events import (
     IntegrationWebhookComplete,
     IntegrationWebhookFailed
 )
-from app import settings
-from app.services.activity_logger import publish_event, activity_logger, webhook_activity_logger, log_activity
-from app.webhooks import GenericJsonPayload, GenericJsonTransformConfig
+from gundi_action_runner import settings
+from gundi_action_runner.services.activity_logger import publish_event, activity_logger, webhook_activity_logger, log_activity
+from gundi_action_runner.webhooks import GenericJsonPayload, GenericJsonTransformConfig
 
 
 @pytest.mark.parametrize(
@@ -27,7 +27,7 @@ async def test_publish_event(
         mocker, mock_pubsub_client, integration_event_pubsub_message, gcp_pubsub_publish_response,
         system_event
 ):
-    mocker.patch("app.services.activity_logger.pubsub", mock_pubsub_client)
+    mocker.patch("gundi_action_runner.services.activity_logger.pubsub", mock_pubsub_client)
 
     response = await publish_event(
         event=system_event,
@@ -50,7 +50,7 @@ async def test_activity_logger_decorator(
         mocker, mock_publish_event, integration_v2, pull_observations_config
 ):
 
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @activity_logger()
     async def action_pull_observations(integration, action_config):
@@ -73,7 +73,7 @@ async def test_webhook_activity_logger(
         mock_webhook_request_payload_for_dynamic_schema, mock_generic_webhook_config
 ):
 
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @webhook_activity_logger()
     async def webhook_handler(payload: GenericJsonPayload, integration=None, webhook_config: GenericJsonTransformConfig = None):
@@ -96,7 +96,7 @@ async def test_webhook_activity_logger_on_error(
         mocker, mock_publish_event, integration_v2_with_webhook_generic,
         mock_webhook_request_payload_for_dynamic_schema, mock_generic_webhook_config
 ):
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @webhook_activity_logger()
     async def webhook_handler(payload: GenericJsonPayload, integration=None,
@@ -121,7 +121,7 @@ async def test_activity_logger_decorator_with_arguments(
         mocker, mock_publish_event, integration_v2, pull_observations_config
 ):
 
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @activity_logger(on_start=False, on_completion=True, on_error=False)
     async def action_pull_observations(integration, action_config):
@@ -142,7 +142,7 @@ async def test_activity_logger_decorator_on_error(
         mocker, mock_publish_event, integration_v2, pull_observations_config
 ):
 
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @activity_logger()
     async def action_pull_observations(integration, action_config):
@@ -162,7 +162,7 @@ async def test_activity_logger_decorator_on_error(
 
 @pytest.mark.asyncio
 async def test_log_activity_with_debug_level(mocker, integration_v2, pull_observations_config, mock_publish_event):
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
     await log_activity(
         integration_id=integration_v2.id,
         action_id="pull_observations",
@@ -177,7 +177,7 @@ async def test_log_activity_with_debug_level(mocker, integration_v2, pull_observ
 
 @pytest.mark.asyncio
 async def test_log_activity_with_info_level(mocker, integration_v2, mock_publish_event, pull_observations_config):
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
     await log_activity(
         integration_id=integration_v2.id,
         action_id="pull_observations",
@@ -192,7 +192,7 @@ async def test_log_activity_with_info_level(mocker, integration_v2, mock_publish
 
 @pytest.mark.asyncio
 async def test_log_activity_with_warning_level(mocker, integration_v2, mock_publish_event, pull_observations_config):
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
     await log_activity(
         integration_id=integration_v2.id,
         action_id="pull_observations",
@@ -206,7 +206,7 @@ async def test_log_activity_with_warning_level(mocker, integration_v2, mock_publ
 
 @pytest.mark.asyncio
 async def test_log_activity_with_error_level(mocker, integration_v2, mock_publish_event, pull_observations_config):
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
     await log_activity(
         integration_id=integration_v2.id,
         action_id="pull_observations",

@@ -1,5 +1,5 @@
 import pytest
-from app.services.gundi import send_events_to_gundi, send_observations_to_gundi, send_event_attachments_to_gundi
+from gundi_action_runner.services.gundi import send_events_to_gundi, send_observations_to_gundi, send_event_attachments_to_gundi
 
 
 @pytest.mark.asyncio
@@ -7,9 +7,9 @@ async def test_send_events_to_gundi(
         mocker, mock_gundi_client_v2_class, mock_gundi_sensors_client_class,
         mock_get_gundi_api_key, integration_v2
 ):
-    mocker.patch("app.services.gundi.GundiClient", mock_gundi_client_v2_class)
-    mocker.patch("app.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
-    mocker.patch("app.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
+    mocker.patch("gundi_action_runner.services.gundi.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
+    mocker.patch("gundi_action_runner.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
     events = [
         {
             "title": "Animal Sighting",
@@ -54,9 +54,9 @@ async def test_send_event_attachments_to_gundi(
         mocker, mock_gundi_client_v2_class, mock_gundi_sensors_client_class,
         mock_get_gundi_api_key, integration_v2
 ):
-    mocker.patch("app.services.gundi.GundiClient", mock_gundi_client_v2_class)
-    mocker.patch("app.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
-    mocker.patch("app.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
+    mocker.patch("gundi_action_runner.services.gundi.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
+    mocker.patch("gundi_action_runner.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
     attachments = [
         ("file1.png", b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00x\x00x\x00\x00\xff\xdb\x00C\x00\x02\x01\x01\x02'),
         ("file2.png", b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x06\x01\x01\x00x\x00x\x01\x00\xff\xd5\x00C\x00\x98\x01\x01\x56')
@@ -81,9 +81,9 @@ async def test_send_observations_to_gundi(
         mocker, mock_gundi_client_v2_class, mock_gundi_sensors_client_class,
         mock_get_gundi_api_key, integration_v2
 ):
-    mocker.patch("app.services.gundi.GundiClient", mock_gundi_client_v2_class)
-    mocker.patch("app.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
-    mocker.patch("app.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
+    mocker.patch("gundi_action_runner.services.gundi.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.gundi.GundiDataSenderClient", mock_gundi_sensors_client_class)
+    mocker.patch("gundi_action_runner.services.gundi._get_gundi_api_key", mock_get_gundi_api_key)
     observations = [
         {
             "source": "device-xy123",

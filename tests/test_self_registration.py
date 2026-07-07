@@ -1,9 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.actions import action_title
+from gundi_action_runner.actions import action_title
 from app.main import app
-from app.services.self_registration import register_integration_in_gundi
-from app.services.action_scheduler import crontab_schedule, CrontabSchedule
+from gundi_action_runner.services.self_registration import register_integration_in_gundi
+from gundi_action_runner.services.action_scheduler import crontab_schedule, CrontabSchedule
 
 api_client = TestClient(app)
 
@@ -15,10 +15,10 @@ async def test_register_integration_with_slug_setting(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(gundi_client=mock_gundi_client_v2)
@@ -143,10 +143,10 @@ async def test_register_integration_with_slug_arg(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.action_runner.action_handlers", mock_action_handlers)
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.action_runner.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(
@@ -272,10 +272,10 @@ async def test_register_integration_with_service_url_arg(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     service_url = "https://xtracker-actions-runner-jabcutl8yb-uc.a.run.app"
@@ -404,11 +404,11 @@ async def test_register_integration_with_service_url_setting(
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
     service_url = "https://xtracker-actions-runner-jabcutl8yb-uc.a.run.app"
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
-    mocker.patch("app.services.self_registration.INTEGRATION_SERVICE_URL", service_url)
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_SERVICE_URL", service_url)
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
 
@@ -537,12 +537,12 @@ async def test_register_integration_with_executable_action(
     mock_auth_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
     mocker.patch(
-        "app.services.self_registration.action_handlers", mock_auth_action_handlers
+        "gundi_action_runner.services.self_registration.action_handlers", mock_auth_action_handlers
     )
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(gundi_client=mock_gundi_client_v2)
@@ -624,9 +624,9 @@ async def test_register_integration_with_type_name_arg(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(
@@ -652,11 +652,11 @@ async def test_register_integration_with_type_name_setting(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "savannahtracking")
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_NAME", "Savannah Tracking")
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "savannahtracking")
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_NAME", "Savannah Tracking")
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(gundi_client=mock_gundi_client_v2)
@@ -673,11 +673,11 @@ async def test_register_integration_with_action_title(
     mock_action_handlers,
     mock_get_webhook_handler_for_fixed_json_payload,
 ):
-    mocker.patch("app.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
+    mocker.patch("gundi_action_runner.services.self_registration.INTEGRATION_TYPE_SLUG", "x_tracker")
     mock_action_handlers["pull_observations"][0].action_title = "Fetch Collar Positions"
-    mocker.patch("app.services.self_registration.action_handlers", mock_action_handlers)
+    mocker.patch("gundi_action_runner.services.self_registration.action_handlers", mock_action_handlers)
     mocker.patch(
-        "app.services.self_registration.get_webhook_handler",
+        "gundi_action_runner.services.self_registration.get_webhook_handler",
         mock_get_webhook_handler_for_fixed_json_payload,
     )
     await register_integration_in_gundi(gundi_client=mock_gundi_client_v2)
@@ -716,7 +716,7 @@ async def test_crontab_schedule_decorator(
         mocker, mock_publish_event, integration_v2, pull_observations_config
 ):
 
-    mocker.patch("app.services.activity_logger.publish_event", mock_publish_event)
+    mocker.patch("gundi_action_runner.services.activity_logger.publish_event", mock_publish_event)
 
     @crontab_schedule("5-55/10 * * * *")
     async def action_pull_observations(integration, action_config):

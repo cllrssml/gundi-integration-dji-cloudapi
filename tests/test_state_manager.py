@@ -2,13 +2,13 @@ import datetime
 import json
 
 import pytest
-from app.conftest import async_return
-from app.services.state import IntegrationStateManager
+from gundi_action_runner.testing.fixtures import async_return
+from gundi_action_runner.services.state import IntegrationStateManager
 
 
 @pytest.mark.asyncio
 async def test_set_integration_state(mocker, mock_redis, integration_v2):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     execution_timestamp = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
     integration_id = str(integration_v2.id)
@@ -29,7 +29,7 @@ async def test_set_integration_state(mocker, mock_redis, integration_v2):
 
 @pytest.mark.asyncio
 async def test_get_integration_state(mocker, mock_redis, integration_v2, mock_integration_state):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     integration_id = str(integration_v2.id)
 
@@ -47,7 +47,7 @@ async def test_get_integration_state(mocker, mock_redis, integration_v2, mock_in
 
 @pytest.mark.asyncio
 async def test_delete_integration_state(mocker, mock_redis, integration_v2):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
 
     execution_timestamp = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
@@ -83,7 +83,7 @@ async def test_delete_integration_state(mocker, mock_redis, integration_v2):
 
 @pytest.mark.asyncio
 async def test_set_if_absent(mocker, mock_redis, integration_v2):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     integration_id = str(integration_v2.id)
 
@@ -117,7 +117,7 @@ async def test_set_if_absent(mocker, mock_redis, integration_v2):
 
 @pytest.mark.asyncio
 async def test_set_source_state(mocker, mock_redis, integration_v2, mock_integration_state):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     integration_id = str(integration_v2.id)
     source_id = "device-123"
@@ -137,7 +137,7 @@ async def test_set_source_state(mocker, mock_redis, integration_v2, mock_integra
 
 @pytest.mark.asyncio
 async def test_get_state_source_state(mocker, mock_redis, integration_v2, mock_integration_state):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     integration_id = str(integration_v2.id)
     source_id = "device-123"
@@ -156,7 +156,7 @@ async def test_get_state_source_state(mocker, mock_redis, integration_v2, mock_i
 
 @pytest.mark.asyncio
 async def test_delete_state_source_state(mocker, mock_redis, integration_v2, mock_integration_state):
-    mocker.patch("app.services.state.redis", mock_redis)
+    mocker.patch("gundi_action_runner.services.state.redis", mock_redis)
     state_manager = IntegrationStateManager()
     integration_id = str(integration_v2.id)
     source_id = "device-123"

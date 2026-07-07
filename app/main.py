@@ -7,13 +7,13 @@ from fastapi import FastAPI, Request, status, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.responses import JSONResponse
-from app.routers import actions, webhooks, config_events
-import app.settings as settings
+from gundi_action_runner.routers import actions, webhooks, config_events
+from gundi_action_runner import settings
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.services.action_runner import execute_action, _portal
-from app.services.self_registration import register_integration_in_gundi
-from app.services.webhooks import close_diagnostic_client
+from gundi_action_runner.services.action_runner import execute_action, _portal
+from gundi_action_runner.services.self_registration import register_integration_in_gundi
+from gundi_action_runner.services.webhooks import close_diagnostic_client
 
 
 # For running behind a proxy, we'll want to configure the root path for OpenAPI browser.

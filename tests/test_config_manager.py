@@ -1,15 +1,15 @@
 import pytest
 
 from gundi_core.schemas.v2 import IntegrationSummary, IntegrationActionConfiguration, Integration, WebhookConfiguration
-from app.services.config_manager import IntegrationConfigurationManager
+from gundi_action_runner.services.config_manager import IntegrationConfigurationManager
 
 
 @pytest.mark.asyncio
 async def test_get_integration_from_redis(
         mocker, mock_redis_with_integration_config, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_with_integration_config)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_with_integration_config)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
 
@@ -26,8 +26,8 @@ async def test_get_integration_from_redis(
 async def test_get_integration_from_gundi(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
 
@@ -42,8 +42,8 @@ async def test_get_integration_from_gundi(
 
 @pytest.mark.asyncio
 async def test_set_integration(mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
 
     await config_manager.set_integration(integration_v2)
@@ -59,8 +59,8 @@ async def test_set_integration(mocker, mock_redis_empty, mock_gundi_client_v2_cl
 async def test_get_action_configuration_from_redis(
         mocker, mock_redis_with_action_config, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_with_action_config)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_with_action_config)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
     action_v2 = integration_v2.configurations[0].action
@@ -77,8 +77,8 @@ async def test_get_action_configuration_from_redis(
 async def test_get_action_configuration_from_gundi(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
     action_v2 = integration_v2.configurations[0].action
@@ -96,8 +96,8 @@ async def test_get_action_configuration_from_gundi(
 async def test_get_integration_details_with_empty_redis_db(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
 
@@ -119,8 +119,8 @@ async def test_get_integration_details_with_empty_redis_db(
 async def test_get_integration_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
     ttl = 3600
@@ -142,8 +142,8 @@ async def test_get_integration_with_ttl(
 async def test_get_action_configuration_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
     action_v2 = integration_v2.configurations[0].action
@@ -172,8 +172,8 @@ async def test_get_action_configuration_with_ttl(
 async def test_set_action_configuration_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2.id)
     action_v2 = integration_v2.configurations[0]
@@ -193,8 +193,8 @@ async def test_set_action_configuration_with_ttl(
 async def test_set_integration_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     ttl = 900
 
@@ -213,8 +213,8 @@ async def test_set_integration_with_ttl(
 async def test_get_webhook_configuration_from_redis(
         mocker, mock_redis_with_webhook_config, mock_gundi_client_v2_class, integration_v2_with_webhook,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_with_webhook_config)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_with_webhook_config)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     config_manager = IntegrationConfigurationManager()
     integration_id = str(integration_v2_with_webhook.id)
 
@@ -232,8 +232,8 @@ async def test_get_webhook_configuration_from_redis(
 async def test_get_webhook_configuration_from_gundi(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2_with_webhook,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     # Override the get_integration_details method to return webhook integration
     mock_gundi_client_v2_class.return_value.get_integration_details = mocker.AsyncMock(return_value=integration_v2_with_webhook)
     
@@ -254,8 +254,8 @@ async def test_get_webhook_configuration_from_gundi(
 async def test_get_webhook_configuration_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2_with_webhook,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     # Override the get_integration_details method to return webhook integration
     mock_gundi_client_v2_class.return_value.get_integration_details = mocker.AsyncMock(return_value=integration_v2_with_webhook)
     
@@ -279,8 +279,8 @@ async def test_get_webhook_configuration_with_ttl(
 async def test_get_integration_details_with_webhook_configuration(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2_with_webhook,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     # Override the get_integration_details method to return webhook integration
     mock_gundi_client_v2_class.return_value.get_integration_details = mocker.AsyncMock(return_value=integration_v2_with_webhook)
     
@@ -303,8 +303,8 @@ async def test_get_integration_details_with_webhook_configuration(
 async def test_get_integration_details_with_ttl(
         mocker, mock_redis_empty, mock_gundi_client_v2_class, integration_v2_with_webhook,
 ):
-    mocker.patch("app.services.config_manager.redis", mock_redis_empty)
-    mocker.patch("app.services.config_manager.GundiClient", mock_gundi_client_v2_class)
+    mocker.patch("gundi_action_runner.services.config_manager.redis", mock_redis_empty)
+    mocker.patch("gundi_action_runner.services.config_manager.GundiClient", mock_gundi_client_v2_class)
     # Override the get_integration_details method to return webhook integration
     mock_gundi_client_v2_class.return_value.get_integration_details = mocker.AsyncMock(return_value=integration_v2_with_webhook)
     
