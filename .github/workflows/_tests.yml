@@ -19,5 +19,7 @@ jobs:
         run: pip-compile --output-file=requirements.txt requirements-base.in requirements-dev.in requirements.in
       - name: Install dependencies
         run: pip install --no-cache-dir -r requirements.txt
+      - name: Install the gundi-action-runner library (in-repo)
+        run: pip install -e . --no-deps
       - name: Run unit tests
         run: pytest
