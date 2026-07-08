@@ -40,6 +40,9 @@ Existing forks are unaffected: `app/*` modules remain as compatibility shims
 `examples/reference_connector/` for a complete example and
 `docs/superpowers/specs/2026-07-07-action-runner-library-design.md` for the design.
 
+Maintainers: see `RELEASING.md` for how releases are cut and the one-time
+PyPI trusted-publishing setup.
+
 ## Action Examples: 
 
 ```python
