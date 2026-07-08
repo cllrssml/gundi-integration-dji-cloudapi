@@ -13,7 +13,7 @@
 
 ## Every release
 
-1. Bump `[project].version` in `pyproject.toml` (e.g. `0.1.0.dev0` → `0.1.0`).
+1. Bump `__version__` in `src/gundi_action_runner/__init__.py` (the single version source; pyproject reads it via [tool.setuptools.dynamic]) (e.g. `0.1.0.dev0` → `0.1.0`).
    The publish workflow refuses `dev` versions and mismatched tags.
 2. If this is the first non-dev release, update the README "Using as a
    library (preview)" section: replace "(not yet on PyPI)" with the install

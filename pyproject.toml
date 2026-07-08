@@ -1,13 +1,14 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "gundi-action-runner"
-version = "0.1.0.dev0"
+dynamic = ["version"]
 description = "Framework for building Gundi integration action runners"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
     "environs~=9.5",
@@ -45,6 +46,9 @@ gundi-action-runner = "gundi_action_runner.testing.fixtures"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "gundi_action_runner.__version__" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "examples", "app"]
