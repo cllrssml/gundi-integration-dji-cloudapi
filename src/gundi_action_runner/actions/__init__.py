@@ -2,7 +2,11 @@ from .core import *
 
 
 def setup_action_handlers():
-    return discover_actions(module_name="app.actions.handlers", prefix="action_")
+    try:
+        return discover_actions(module_name="app.actions.handlers", prefix="action_")
+    except ModuleNotFoundError:
+        # Module not found; return empty dict. Handlers will be registered via decorators.
+        return {}
 
 
 def get_action_handler_by_data_type(type_name: str):
