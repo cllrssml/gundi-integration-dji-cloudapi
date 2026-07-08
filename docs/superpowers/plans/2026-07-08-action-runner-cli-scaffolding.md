@@ -6,7 +6,7 @@
 
 **Architecture:** A `click` CLI at `src/gundi_action_runner/cli.py` (console script `gundi-runner`, deps via a `cli` extra — copier is the only new dependency). The project template lives in `template/` with a root `copier.yml` using `_subdirectory: template`, so generated projects record this GitHub repo as their template source and `copier update` tracks its tags. `add-action` is pure text codegen against a scaffolded project's `handlers.py`/`configurations.py`. Docs are three focused markdown files under `docs/`.
 
-**Tech Stack:** click 8 (existing core dep), copier ~9.4 (cli extra), Jinja templates (copier), uvicorn (existing core dep) for `run`.
+**Tech Stack:** click 8 (existing core dep), copier ~7.2 (cli extra; the last pydantic-v1-compatible line), Jinja templates (copier), uvicorn (existing core dep) for `run`.
 
 **Spec:** `docs/superpowers/specs/2026-07-07-action-runner-library-design.md` (phases 6–8, Section 4). Plans 1–2 are complete on branch `design/action-runner-library` (PR #78); suite is 130 passing; single version source is `__version__` in `src/gundi_action_runner/__init__.py`.
 
@@ -16,7 +16,7 @@
 - **Never edit fork-owned files:** `app/actions/handlers.py`, `app/actions/configurations.py`, `app/webhooks/handlers.py`, `app/webhooks/configurations.py`, `app/settings/integration.py`, `app/register.py`.
 - Always `source .venv/bin/activate` and `python -m pip` (bare `pip` is the system pip on this machine).
 - Version stays `0.1.0.dev0`. Scaffolded projects depend on `gundi-action-runner~=0.1` — correct for the upcoming first release.
-- CLI command name `gundi-runner`; extras: `cli = ["copier~=9.4"]`, `testing = ["pytest~=7.4.3", "pytest-mock~=3.12.0", "pytest-asyncio~=0.21.1"]`.
+- CLI command name `gundi-runner`; extras: `cli = ["copier~=7.2", "pyyaml-include<2"]` (copier 8+ requires pydantic v2, which conflicts with the library's `pydantic<2` pin; pyyaml-include 2.x breaks copier 7), `testing = ["pytest~=7.4.3", "pytest-mock~=3.12.0", "pytest-asyncio~=0.21.1"]`.
 - Default template source for `new` is `gh:PADAS/gundi-integration-action-runner` (overridable with `--template` — tests use a local staged copy).
 - Decorator-ordering rule holds everywhere docs/templates show stacked decorators: `@action.*`/`@webhook` outermost.
 - Suite green at end of every task (130 + new tests). Commit messages end with a blank line then:
@@ -41,7 +41,10 @@ In `[project.optional-dependencies]` add after the `dev` list:
 
 ```toml
 cli = [
-    "copier~=9.4",
+    # copier 8+ requires pydantic v2 (conflicts with our pydantic<2 pin);
+    # pyyaml-include 2.x removed the API copier 7 uses.
+    "copier~=7.2",
+    "pyyaml-include<2",
 ]
 testing = [
     "pytest~=7.4.3",
@@ -62,7 +65,7 @@ Then reinstall so the console script registers:
 ```bash
 source .venv/bin/activate
 python -m pip install -e ".[cli]" --no-deps
-python -m pip install "copier~=9.4"
+python -m pip install "copier~=7.2" "pyyaml-include<2"
 gundi-runner --help || echo "EXPECTED FAILURE until cli.py exists"
 ```
 
@@ -282,7 +285,7 @@ The scaffold source. Root `copier.yml` (with `_subdirectory: template`) + `templ
 # Generated projects record this repo as their template source, so
 # `copier update` can pull scaffold improvements from future tags.
 _subdirectory: template
-_min_copier_version: "9.0.0"
+_min_copier_version: "7.2.0"
 
 project_name:
   type: str
@@ -293,7 +296,7 @@ package_name:
   help: Python package name for your connector code
   default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
   validator: >-
-    {% if not (package_name | regex_search('^[a-z][a-z0-9_]+$')) %}
+    {% if not package_name.isidentifier() or package_name != package_name.lower() %}
     package_name must be a valid lowercase Python identifier
     {% endif %}
 
@@ -654,7 +657,7 @@ def generate_project(staged_template, tmp_path):
         dst = tmp_path / "generated"
         copier.run_copy(
             str(staged_template), str(dst), data=defaults,
-            defaults=True, overwrite=True, unsafe=True, quiet=True,
+            defaults=True, overwrite=True, quiet=True,
         )
         return dst
 
@@ -813,7 +816,7 @@ def new(destination, template, vcs_ref, data_pairs):
             value = value.lower() == "true"
         data[key] = value
     copier.run_copy(
-        template, destination, data=data, vcs_ref=vcs_ref, unsafe=True,
+        template, destination, data=data, vcs_ref=vcs_ref,
     )
     click.echo(
         f"\nProject created at {destination}. Next steps:\n"
