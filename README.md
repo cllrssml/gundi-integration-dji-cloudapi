@@ -19,6 +19,27 @@ Template repo for integration in Gundi v2.
 - Optionally, use  `@crontab_schedule()` or `register.py --schedule` to make an action to run on a custom schedule
 
 
+## Using as a library (preview)
+
+The framework in this repo is being extracted into an installable package,
+`gundi-action-runner` (not yet on PyPI). Connectors will register handlers with
+decorators instead of editing template files:
+
+```python
+from gundi_action_runner import action, create_app
+
+@action.pull(config=MyPullConfig, title="Pull Observations")
+async def pull_observations(integration, action_config):
+    ...
+
+app = create_app(handlers_modules=["myconnector.handlers"])
+```
+
+Existing forks are unaffected: `app/*` modules remain as compatibility shims
+(emitting `DeprecationWarning`), and `uvicorn app.main:app` still works. See
+`examples/reference_connector/` for a complete example and
+`docs/superpowers/specs/2026-07-07-action-runner-library-design.md` for the design.
+
 ## Action Examples: 
 
 ```python
