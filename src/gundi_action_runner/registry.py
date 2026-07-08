@@ -7,6 +7,11 @@ from gundi_action_runner.actions.core import PushActionConfiguration, discover_a
 logger = logging.getLogger(__name__)
 
 
+def _is_module_or_parent(missing_name, target):
+    """True when `missing_name` is `target` itself or a parent package of it."""
+    return target == missing_name or target.startswith(missing_name + ".")
+
+
 class RegistryError(Exception):
     """Raised for invalid or conflicting handler registrations."""
 
@@ -131,7 +136,7 @@ class ActionRegistry:
             try:
                 self.load_legacy_actions(settings.GUNDI_LEGACY_ACTIONS_MODULE)
             except ModuleNotFoundError as e:
-                if e.name != settings.GUNDI_LEGACY_ACTIONS_MODULE:
+                if not _is_module_or_parent(e.name, settings.GUNDI_LEGACY_ACTIONS_MODULE):
                     raise  # a broken import INSIDE the module must fail loudly
                 logger.warning(
                     f"No legacy actions module '{settings.GUNDI_LEGACY_ACTIONS_MODULE}' found; "
@@ -141,7 +146,7 @@ class ActionRegistry:
             try:
                 self.load_legacy_webhook(settings.GUNDI_LEGACY_WEBHOOKS_MODULE)
             except ModuleNotFoundError as e:
-                if e.name != settings.GUNDI_LEGACY_WEBHOOKS_MODULE:
+                if not _is_module_or_parent(e.name, settings.GUNDI_LEGACY_WEBHOOKS_MODULE):
                     raise
             except AttributeError:
                 pass  # module exists but defines no webhook_handler — fine

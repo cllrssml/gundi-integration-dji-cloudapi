@@ -83,3 +83,19 @@ def test_create_app_scans_legacy_module_when_registry_empty(monkeypatch):
         assert "pull_legacy" in registry.action_handlers
     finally:
         del sys.modules["fake_legacy_for_factory"]
+
+
+def test_create_app_tolerates_entirely_missing_legacy_packages(monkeypatch):
+    # Pure-library scenario: no `app` package at all. The parent package being
+    # missing must not crash create_app; a broken import INSIDE an existing
+    # module still must (covered by the e.name narrowing).
+    monkeypatch.setattr(
+        "gundi_action_runner.settings.GUNDI_LEGACY_ACTIONS_MODULE",
+        "nonexistent_pkg.actions.handlers",
+    )
+    monkeypatch.setattr(
+        "gundi_action_runner.settings.GUNDI_LEGACY_WEBHOOKS_MODULE",
+        "nonexistent_pkg.webhooks.handlers",
+    )
+    app = create_app()  # must not raise
+    assert app.title == "Gundi Integration Actions Execution Service"
