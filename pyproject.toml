@@ -32,6 +32,9 @@ dev = [
     "pytest-mock~=3.12.0",
 ]
 
+[project.entry-points.pytest11]
+gundi-action-runner = "gundi_action_runner.testing.fixtures"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
