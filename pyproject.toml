@@ -41,8 +41,10 @@ dev = [
     "packaging>=24.2",
 ]
 cli = [
-    "click~=8.1.7",
-    "uvicorn~=0.30.0",
+    # copier 8+ requires pydantic v2 (conflicts with our pydantic<2 pin);
+    # pyyaml-include 2.x removed the API copier 7 uses.
+    "copier~=7.2",
+    "pyyaml-include<2",
 ]
 testing = [
     "pytest~=7.4.3",
