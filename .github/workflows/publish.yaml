@@ -25,13 +25,18 @@ jobs:
       - name: Verify tag matches package version
         run: |
           python - <<'EOF'
-          import os, sys, tomllib
-          with open("pyproject.toml", "rb") as f:
-              version = tomllib.load(f)["project"]["version"]
+          import ast, os, pathlib, sys
+          tree = ast.parse(pathlib.Path("src/gundi_action_runner/__init__.py").read_text())
+          version = next(
+              node.value.value
+              for node in ast.walk(tree)
+              if isinstance(node, ast.Assign)
+              and any(getattr(t, "id", None) == "__version__" for t in node.targets)
+          )
           tag = os.environ["GITHUB_REF_NAME"].removeprefix("v")
           if tag != version:
-              sys.exit(f"Tag v{tag} does not match pyproject version {version}. "
-                       f"Bump [project].version before tagging (see RELEASING.md).")
+              sys.exit(f"Tag v{tag} does not match package version {version}. "
+                       f"Bump __version__ in src/gundi_action_runner/__init__.py before tagging (see RELEASING.md).")
           if "dev" in version:
               sys.exit(f"Refusing to publish a dev version ({version}).")
           EOF
