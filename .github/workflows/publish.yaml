@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"   # tomllib is stdlib from 3.11; independent of the package's requires-python
+          python-version: "3.11"   # pinned for a deterministic build/twine env; independent of the package's requires-python
       - name: Verify tag matches package version
         run: |
           python - <<'EOF'
