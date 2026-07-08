@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68,<70.3"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -35,7 +35,9 @@ dev = [
     "pytest-asyncio~=0.21.1",
     "pytest-mock~=3.12.0",
     "build~=1.2",
-    "twine~=5.1",
+    # twine + modern packaging: Metadata-2.4 (License-File) aware "twine check"
+    "twine~=6.1",
+    "packaging>=24.2",
 ]
 
 [project.entry-points.pytest11]
