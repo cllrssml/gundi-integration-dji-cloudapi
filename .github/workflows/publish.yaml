@@ -1,0 +1,44 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  run_unit_tests:
+    uses: ./.github/workflows/_tests.yml
+
+  build_and_publish:
+    needs: run_unit_tests
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # OIDC for PyPI trusted publishing
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"   # tomllib is stdlib from 3.11; independent of the package's requires-python
+      - name: Verify tag matches package version
+        run: |
+          python - <<'EOF'
+          import os, sys, tomllib
+          with open("pyproject.toml", "rb") as f:
+              version = tomllib.load(f)["project"]["version"]
+          tag = os.environ["GITHUB_REF_NAME"].removeprefix("v")
+          if tag != version:
+              sys.exit(f"Tag v{tag} does not match pyproject version {version}. "
+                       f"Bump [project].version before tagging (see RELEASING.md).")
+          if "dev" in version:
+              sys.exit(f"Refusing to publish a dev version ({version}).")
+          EOF
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install "build~=1.2" "twine~=5.1"
+          python -m build
+          python -m twine check dist/*
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
