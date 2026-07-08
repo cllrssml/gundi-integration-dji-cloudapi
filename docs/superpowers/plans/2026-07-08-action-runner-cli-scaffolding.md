@@ -94,6 +94,9 @@ def test_cli_group_lists_commands(runner):
 
 def test_run_invokes_uvicorn_with_factory(runner, mocker, monkeypatch):
     monkeypatch.delenv("GUNDI_HANDLERS_MODULES", raising=False)
+    # The CLI mutates this module attribute; monkeypatch restores it at
+    # teardown so later tests' ensure_loaded() doesn't import myconn.handlers.
+    monkeypatch.setattr("gundi_action_runner.settings.GUNDI_HANDLERS_MODULES", None)
     uvicorn_run = mocker.patch("uvicorn.run")
     result = runner.invoke(
         cli, ["run", "--handlers", "myconn.handlers", "--port", "9000"]
