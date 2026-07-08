@@ -115,4 +115,36 @@ class ActionRegistry:
         self.register_webhook(module.webhook_handler)
 
 
+    def ensure_loaded(self):
+        """Populate the registry from env-configured modules if it is empty.
+
+        Called by create_app() and register_integration_in_gundi() so both the
+        server path and the CLI registration path see the connector's handlers.
+        """
+        from gundi_action_runner import settings  # deferred: avoid import-time env coupling
+
+        if not self.action_handlers and settings.GUNDI_HANDLERS_MODULES:
+            self.load_modules(
+                [m.strip() for m in settings.GUNDI_HANDLERS_MODULES.split(",") if m.strip()]
+            )
+        if not self.action_handlers:
+            try:
+                self.load_legacy_actions(settings.GUNDI_LEGACY_ACTIONS_MODULE)
+            except ModuleNotFoundError as e:
+                if e.name != settings.GUNDI_LEGACY_ACTIONS_MODULE:
+                    raise  # a broken import INSIDE the module must fail loudly
+                logger.warning(
+                    f"No legacy actions module '{settings.GUNDI_LEGACY_ACTIONS_MODULE}' found; "
+                    f"no actions registered."
+                )
+        if self.webhook_handler is None:
+            try:
+                self.load_legacy_webhook(settings.GUNDI_LEGACY_WEBHOOKS_MODULE)
+            except ModuleNotFoundError as e:
+                if e.name != settings.GUNDI_LEGACY_WEBHOOKS_MODULE:
+                    raise
+            except AttributeError:
+                pass  # module exists but defines no webhook_handler — fine
+
+
 registry = ActionRegistry()

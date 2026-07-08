@@ -64,6 +64,14 @@ REDIS_CONFIGS_DB = env.int("REDIS_CONFIGS_DB", 1)  # ToDo: define a convention f
 
 REGISTER_ON_START = env.bool("REGISTER_ON_START", False)
 INTEGRATION_TYPE_SLUG = env.str("INTEGRATION_TYPE_SLUG", None)  # Define a string id here e.g. "my_tracker"
+
+# How the connector's handlers are discovered by create_app():
+# comma-separated import paths of modules using the @action/@webhook decorators...
+GUNDI_HANDLERS_MODULES = env.str("GUNDI_HANDLERS_MODULES", None)
+# ...and/or the legacy template-fork convention (action_-prefixed functions,
+# module-level webhook_handler), scanned as a fallback.
+GUNDI_LEGACY_ACTIONS_MODULE = env.str("GUNDI_LEGACY_ACTIONS_MODULE", "app.actions.handlers")
+GUNDI_LEGACY_WEBHOOKS_MODULE = env.str("GUNDI_LEGACY_WEBHOOKS_MODULE", "app.webhooks.handlers")
 INTEGRATION_TYPE_NAME = env.str("INTEGRATION_TYPE_NAME", None)  # Display name e.g. "My Tracker"; defaults to a name derived from the slug
 INTEGRATION_SERVICE_URL = env.str("INTEGRATION_SERVICE_URL", None)  # Define a string id here e.g. "my_tracker"
 PROCESS_PUBSUB_MESSAGES_IN_BACKGROUND = env.bool("PROCESS_PUBSUB_MESSAGES_IN_BACKGROUND", False)

@@ -1,5 +1,3 @@
-import importlib
-import inspect
 import json
 from typing import Optional, Union
 from pydantic import BaseModel
@@ -110,20 +108,9 @@ class GenericJsonWithHexStrPayload(HexStringPayload, GenericJsonPayload):
 
 
 def get_webhook_handler():
+    from gundi_action_runner.registry import registry  # deferred: avoids a module cycle
 
-    # Import the module using importlib
-    module = importlib.import_module("app.webhooks.handlers")
-    handler = module.webhook_handler
-
-    if (annotation := inspect.signature(handler).parameters.get("payload").annotation) != inspect._empty:
-        payload_model = annotation
-    else:
-        payload_model = None
-
-    # Introspect schemas
-    if (annotation := inspect.signature(handler).parameters.get("webhook_config").annotation) != inspect._empty:
-        config_model = annotation
-    else:
-        config_model = None
-
-    return handler, payload_model, config_model
+    if registry.webhook_handler is None:
+        from gundi_action_runner import settings
+        registry.load_legacy_webhook(settings.GUNDI_LEGACY_WEBHOOKS_MODULE)
+    return registry.webhook_handler

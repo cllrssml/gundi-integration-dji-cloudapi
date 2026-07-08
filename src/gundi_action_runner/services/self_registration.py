@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 async def register_integration_in_gundi(gundi_client, type_slug=None, type_name=None, service_url=None, action_schedules=None):
+    from gundi_action_runner.registry import registry
+    registry.ensure_loaded()
     # Prepare the integration name and value
     integration_type_slug = type_slug or INTEGRATION_TYPE_SLUG
     if not integration_type_slug:

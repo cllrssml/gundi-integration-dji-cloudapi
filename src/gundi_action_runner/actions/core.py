@@ -90,6 +90,3 @@ def discover_actions(module_name, prefix):
     return action_handlers
 
 
-
-def get_actions():
-    return list(discover_actions(module_name="app.actions.handlers", prefix="action_").keys())
