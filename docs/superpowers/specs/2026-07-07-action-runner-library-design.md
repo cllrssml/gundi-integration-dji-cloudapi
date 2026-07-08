@@ -70,8 +70,8 @@ from myconnector.configurations import PullObsConfig, AuthConfig, PushConfig
 @action.auth(config=AuthConfig)
 async def auth(integration, action_config): ...
 
-@crontab_schedule("*/15 * * * *")
 @action.pull(config=PullObsConfig, title="Fetch Collar Positions")
+@crontab_schedule("*/15 * * * *")
 async def pull_observations(integration, action_config): ...
 
 @action.push(config=PushConfig)   # push validates data/metadata params, as today
@@ -80,6 +80,8 @@ async def push_events(integration, action_config, data: MyData, metadata): ...
 @webhook(config=GenericJsonTransformConfig)   # one webhook handler per connector, as today
 async def webhook_handler(payload, webhook_config): ...
 ```
+
+Note: the `@action.*`/`@webhook` decorator must be outermost (topmost) — it registers the function object it receives, so wrapping decorators like `@activity_logger()` must sit below it.
 
 - **Titles** (PR #77 parity): display-name override is a decorator parameter (`title=...`).
   The registry also sets the `action_title` and `crontab_schedule` **function attributes**, so

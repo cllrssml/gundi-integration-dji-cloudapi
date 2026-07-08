@@ -19,7 +19,9 @@ async def auth(integration, action_config):
 async def pull_observations(integration, action_config):
     # A real connector fetches from the external API, transforms the data, and
     # calls send_observations_to_gundi() here. Add @crontab_schedule(...) and
-    # @activity_logger() from gundi_action_runner.services in a real connector.
+    # @activity_logger() BELOW @action.pull — the @action decorator must be
+    # outermost (it registers the function object it receives; wrappers applied
+    # above it would be invisible to the registry).
     return {"observations_extracted": 0}
 
 

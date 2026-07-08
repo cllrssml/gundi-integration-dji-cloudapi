@@ -197,3 +197,31 @@ def test_load_legacy_webhook_adopts_module_handler(legacy_module):
     sys.modules[legacy_module].webhook_handler = webhook_handler
     registry.load_legacy_webhook(legacy_module)
     assert registry.webhook_handler[0] is webhook_handler
+
+
+def test_sync_webhook_handler_raises_registry_error():
+    """@webhook must reject synchronous functions with an async RegistryError."""
+    from gundi_action_runner.decorators import webhook
+
+    with pytest.raises(RegistryError, match="async"):
+        @webhook
+        def sync_webhook(payload, webhook_config):  # not async
+            return {}
+
+
+def test_load_legacy_webhook_does_not_override_decorator_registration(legacy_module):
+    """A decorator-registered webhook handler must survive load_legacy_webhook."""
+    from gundi_action_runner.decorators import webhook
+
+    @webhook
+    async def decorator_webhook(payload, webhook_config):
+        return {}
+
+    # Add a different webhook_handler to the legacy module
+    async def legacy_webhook(payload, webhook_config):
+        return {}
+
+    sys.modules[legacy_module].webhook_handler = legacy_webhook
+    registry.load_legacy_webhook(legacy_module)
+    # The decorator-registered handler must NOT have been replaced
+    assert registry.webhook_handler[0] is decorator_webhook

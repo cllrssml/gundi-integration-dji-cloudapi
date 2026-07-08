@@ -12,6 +12,7 @@ from gundi_client_v2 import GundiClient
 
 from gundi_action_runner.actions import action_handlers, get_action_handler_by_data_type
 from gundi_action_runner import settings
+from gundi_action_runner.registry import registry
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -170,6 +171,10 @@ async def execute_action(
     # Find the action handler based on the action ID or data type
     if action_id:
         try:  # There must be one action handler implemented for the action
+            if not action_handlers:
+                # Forks call execute_action directly (without create_app), relying on
+                # the template's old import-time handler discovery — populate lazily.
+                registry.ensure_loaded()
             handler, config_model, DataModel = action_handlers[action_id]
         except KeyError:
             return await _handle_error(

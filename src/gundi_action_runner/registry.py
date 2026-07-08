@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 def _is_module_or_parent(missing_name, target):
     """True when `missing_name` is `target` itself or a parent package of it."""
+    if not missing_name:
+        return False
     return target == missing_name or target.startswith(missing_name + ".")
 
 
@@ -76,6 +78,10 @@ class ActionRegistry:
         return func
 
     def register_webhook(self, func, *, payload_model=None, config_model=None):
+        if not inspect.iscoroutinefunction(func):
+            raise RegistryError(
+                f"Webhook handler '{func.__module__}.{func.__qualname__}' must be an async function."
+            )
         if self.webhook_handler is not None:
             existing = self.webhook_handler[0]
             raise RegistryError(

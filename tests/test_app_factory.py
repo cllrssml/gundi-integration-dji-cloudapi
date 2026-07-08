@@ -99,3 +99,63 @@ def test_create_app_tolerates_entirely_missing_legacy_packages(monkeypatch):
     )
     app = create_app()  # must not raise
     assert app.title == "Gundi Integration Actions Execution Service"
+
+
+@pytest.mark.asyncio
+async def test_execute_action_populates_registry_lazily(
+    monkeypatch, mock_gundi_client_v2_class, mock_publish_event, mock_config_manager,
+):
+    """Fork pattern: execute_action called directly without create_app().
+
+    The registry is empty (clean_registry autouse fixture guarantees that).
+    When the lookup for a known action_id is attempted, ensure_loaded() must
+    fire, discover the handler from the legacy module, and the call must
+    succeed (handler return value in the result) rather than KeyError-ing.
+    """
+    from gundi_action_runner.actions.core import PullActionConfiguration
+    from gundi_action_runner.services.action_runner import execute_action
+    from gundi_action_runner.testing.fixtures import async_return
+
+    # Build a minimal fake "legacy" module with one action_pull_things handler
+    module = types.ModuleType("fake_lazy_fork_handlers")
+
+    async def action_pull_things(integration, action_config: PullActionConfiguration):
+        return {"pulled": 42}
+
+    module.action_pull_things = action_pull_things
+    sys.modules["fake_lazy_fork_handlers"] = module
+
+    monkeypatch.setattr(
+        "gundi_action_runner.settings.GUNDI_LEGACY_ACTIONS_MODULE",
+        "fake_lazy_fork_handlers",
+    )
+    # Disable the webhooks legacy scan (no webhook_handler in our fake module)
+    monkeypatch.setattr(
+        "gundi_action_runner.settings.GUNDI_LEGACY_WEBHOOKS_MODULE",
+        "nonexistent_pkg.webhooks.handlers",
+    )
+
+    # Patch the service-layer dependencies exactly as test_action_runner.py does
+    monkeypatch.setattr(
+        "gundi_action_runner.services.action_runner.config_manager", mock_config_manager
+    )
+    monkeypatch.setattr(
+        "gundi_action_runner.services.activity_logger.publish_event", mock_publish_event
+    )
+    monkeypatch.setattr(
+        "gundi_action_runner.services.action_runner.publish_event", mock_publish_event
+    )
+
+    # Confirm the registry is truly empty before the call (clean_registry autouse)
+    from gundi_action_runner.services import action_runner as ar
+    assert not ar.action_handlers, "Registry must be empty at test start"
+
+    try:
+        result = await execute_action(
+            integration_id=str(mock_config_manager.get_integration_details.return_value.result().id),
+            action_id="pull_things",
+        )
+        # The lazy-load path must have found and executed the handler
+        assert result == {"pulled": 42}, f"Expected handler result, got: {result}"
+    finally:
+        del sys.modules["fake_lazy_fork_handlers"]

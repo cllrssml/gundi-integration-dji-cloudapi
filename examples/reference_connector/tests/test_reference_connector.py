@@ -9,11 +9,15 @@ from gundi_action_runner.registry import registry
 
 @pytest.fixture
 def reference_registry():
+    saved_actions = dict(registry.action_handlers)
+    saved_webhook = registry.webhook_handler
     import reference_connector.handlers as handlers
     registry.reset()
     importlib.reload(handlers)  # re-fire decorators against the clean registry
     yield registry
     registry.reset()
+    registry.action_handlers.update(saved_actions)
+    registry.webhook_handler = saved_webhook
 
 
 def test_actions_are_registered(reference_registry):
