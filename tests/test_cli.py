@@ -21,6 +21,7 @@ def test_cli_group_lists_commands(runner):
 
 def test_run_invokes_uvicorn_with_factory(runner, mocker, monkeypatch):
     monkeypatch.delenv("GUNDI_HANDLERS_MODULES", raising=False)
+    monkeypatch.setattr("gundi_action_runner.settings.GUNDI_HANDLERS_MODULES", None)
     uvicorn_run = mocker.patch("uvicorn.run")
     result = runner.invoke(
         cli, ["run", "--handlers", "myconn.handlers", "--port", "9000"]
