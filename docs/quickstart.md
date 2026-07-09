@@ -40,6 +40,18 @@ gundi-runner run --handlers <package>.handlers
 # API docs at http://127.0.0.1:8080/docs
 ```
 
+## Run locally with Docker
+
+Scaffolded projects include a `local/` docker-compose stack: the connector plus
+redis and a Pub/Sub emulator wired so sub-actions loop back into the runner.
+See the generated `local/LOCAL_DEVELOPMENT.md` for setup; in short:
+
+```bash
+cd local
+cp .env.local.example .env.local   # then set KEYCLOAK_CLIENT_SECRET
+docker compose up --build
+```
+
 ## Add another action
 
 ```bash
