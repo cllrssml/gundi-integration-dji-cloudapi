@@ -28,7 +28,7 @@ dependencies = [
 
 [project.urls]
 Repository = "https://github.com/PADAS/gundi-integration-action-runner"
-Documentation = "https://github.com/PADAS/gundi-integration-action-runner#using-as-a-library-preview"
+Documentation = "https://padas.github.io/gundi-integration-action-runner/"
 
 [project.optional-dependencies]
 dev = [
@@ -48,6 +48,10 @@ cli = [
     "copier~=7.2",
     "pyyaml-include<2",
     "plumbum<1.10",
+]
+docs = [
+    "mkdocs-material~=9.5",
+    "mkdocs-exclude~=1.0",
 ]
 testing = [
     "pytest~=7.4.3",
