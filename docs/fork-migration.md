@@ -7,9 +7,12 @@ migrate. Migration is optional and incremental.
 
 ## Step 0 — merge upstream (nothing else changes)
 
-After merging, your CI/Dockerfile (inherited) run `pip install -e . --no-deps`
-so `app.*` imports resolve to the library. Your handlers, configurations,
-tests, and `uvicorn app.main:app` all keep working.
+After merging, your CI (inherited via `.github/workflows/_tests.yml`) runs
+`pip install -e . --no-deps` automatically. Your Dockerfile is fork-owned: add
+the equivalent lines (`COPY pyproject.toml .` / `COPY ./src src/` /
+`RUN pip install -e . --no-deps`) before deploying, or the container will fail
+at startup since the `app/*` shims import `gundi_action_runner`. Your
+handlers, configurations, tests, and `uvicorn app.main:app` all keep working.
 
 **What to expect during the merge:**
 

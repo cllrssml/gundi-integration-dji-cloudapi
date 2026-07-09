@@ -90,7 +90,8 @@ DEFAULT_TEMPLATE = "gh:PADAS/gundi-integration-action-runner"
 @click.option("--template", default=DEFAULT_TEMPLATE, show_default=True,
               help="Copier template source (git URL or local path)")
 @click.option("--vcs-ref", default=None,
-              help="Template git ref (tag/branch); defaults to the latest tag")
+              help="Template git ref; defaults to the tag matching the installed library "
+                   "version (vX.Y.Z) when using the official template")
 @click.option("--data", "data_pairs", multiple=True,
               help="Answer as KEY=VALUE (repeatable); unanswered questions prompt interactively")
 @click.option("--defaults", is_flag=True, default=False,
@@ -106,8 +107,13 @@ def new(destination, template, vcs_ref, data_pairs, defaults):
             "copier is not installed. Install the CLI extras first:\n"
             "  pip install 'gundi-action-runner[cli]'"
         )
+    if template == DEFAULT_TEMPLATE and vcs_ref is None:
+        from gundi_action_runner import __version__
+        vcs_ref = f"v{__version__}"
     data = {}
     for pair in data_pairs:
+        if "=" not in pair:
+            raise click.BadParameter(f"--data expects KEY=VALUE, got {pair!r}")
         key, _, value = pair.partition("=")
         if value.lower() in ("true", "false"):
             value = value.lower() == "true"

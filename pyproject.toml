@@ -42,9 +42,12 @@ dev = [
 ]
 cli = [
     # copier 8+ requires pydantic v2 (conflicts with our pydantic<2 pin);
-    # pyyaml-include 2.x removed the API copier 7 uses.
+    # pyyaml-include 2.x removed the API copier 7 uses;
+    # plumbum>=1.10 crashes copier 7.2's CLI.
+    # All three companion pins lift together once the library moves to pydantic v2.
     "copier~=7.2",
     "pyyaml-include<2",
+    "plumbum<1.10",
 ]
 testing = [
     "pytest~=7.4.3",

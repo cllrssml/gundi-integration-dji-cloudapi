@@ -89,6 +89,21 @@ def test_new_generates_project_from_local_template(runner, staged_template, tmp_
     assert "Next steps" in result.output
 
 
+def test_new_default_template_pins_ref_to_library_version(runner, mocker, tmp_path):
+    run_copy = mocker.patch("copier.run_copy")
+    from gundi_action_runner import __version__
+
+    result = runner.invoke(cli, ["new", str(tmp_path / "x"), "--defaults"])
+    assert result.exit_code == 0, result.output
+    assert run_copy.call_args.kwargs["vcs_ref"] == f"v{__version__}"
+
+
+def test_new_rejects_data_without_equals(runner, tmp_path):
+    result = runner.invoke(cli, ["new", str(tmp_path / "x"), "--data", "project_name"])
+    assert result.exit_code != 0
+    assert "KEY=VALUE" in result.output
+
+
 def test_new_requires_copier(runner, mocker, tmp_path):
     import builtins
 

@@ -10,6 +10,7 @@ def test_generates_expected_tree(generate_project):
         "conftest.py", "acme_tracker/__init__.py", "acme_tracker/handlers.py",
         "acme_tracker/configurations.py", "acme_tracker/client.py",
         "acme_tracker/transformers.py", "tests/test_handlers.py",
+        ".copier-answers.yml",
     ):
         assert (dst / path).exists(), f"missing {path}"
     handlers = (dst / "acme_tracker" / "handlers.py").read_text()
@@ -25,6 +26,8 @@ def test_webhook_variant(generate_project):
     assert "@action.pull" not in handlers
     configurations = (dst / "acme_tracker" / "configurations.py").read_text()
     assert "AcmeTrackerWebhookPayload" in configurations
+    for py in (dst / "acme_tracker").rglob("*.py"):
+        compile(py.read_text(), str(py), "exec")
 
 
 def test_generated_files_are_valid_python(generate_project):

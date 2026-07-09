@@ -6,6 +6,10 @@
 pip install "gundi-action-runner[cli]"
 ```
 
+> **Note:** until the first release (v0.1.0) is published, install from a
+> checkout of this repo (`pip install -e ".[cli]"`) and pass
+> `--template`/`--vcs-ref` to `gundi-runner new` explicitly.
+
 ## Scaffold a project
 
 ```bash

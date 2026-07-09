@@ -27,6 +27,9 @@
 
 4. The `Publish to PyPI` workflow runs tests, builds sdist+wheel, verifies
    the tag matches the version, and publishes via trusted publishing.
+- The release tag doubles as the scaffold template ref: `gundi-runner new`
+  (official template) checks out the tag matching the installed library
+  version, so `vX.Y.Z` must exist for scaffolding to work at that version.
 
 ## Versioning
 
