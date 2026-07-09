@@ -1,0 +1,14 @@
+FROM python:3.10-slim
+
+# Build deps for pyjq (used by the framework's webhook JQ transforms)
+RUN apt-get update && apt-get install -y autoconf automake libtool make python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /code
+COPY pyproject.toml .
+COPY {{ package_name }}/ {{ package_name }}/
+COPY main.py .
+RUN pip install --no-cache-dir .
+
+EXPOSE 8080
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
