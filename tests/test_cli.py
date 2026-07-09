@@ -69,3 +69,36 @@ def test_register_rejects_bad_schedule(runner, mocker):
     result = runner.invoke(cli, ["register", "--schedule", "not-a-schedule"])
     assert result.exit_code != 0
     assert "Invalid schedule format" in result.output
+
+
+def test_new_generates_project_from_local_template(runner, staged_template, tmp_path):
+    dst = tmp_path / "my-connector"
+    result = runner.invoke(
+        cli,
+        [
+            "new", str(dst),
+            "--template", str(staged_template),
+            "--data", "project_name=Acme Tracker",
+            "--data", "include_pull=true",
+            "--data", "include_webhook=false",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert (dst / "acme_tracker" / "handlers.py").exists()
+    assert "Next steps" in result.output
+
+
+def test_new_requires_copier(runner, mocker, tmp_path):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _no_copier(name, *args, **kwargs):
+        if name == "copier":
+            raise ImportError("No module named 'copier'")
+        return real_import(name, *args, **kwargs)
+
+    mocker.patch("builtins.__import__", side_effect=_no_copier)
+    result = runner.invoke(cli, ["new", str(tmp_path / "x")])
+    assert result.exit_code != 0
+    assert "pip install 'gundi-action-runner[cli]'" in result.output

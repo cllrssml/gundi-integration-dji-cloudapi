@@ -82,5 +82,43 @@ def register(slug, name, service_url, handlers, schedule):
     )
 
 
+DEFAULT_TEMPLATE = "gh:PADAS/gundi-integration-action-runner"
+
+
+@cli.command()
+@click.argument("destination", type=click.Path())
+@click.option("--template", default=DEFAULT_TEMPLATE, show_default=True,
+              help="Copier template source (git URL or local path)")
+@click.option("--vcs-ref", default=None,
+              help="Template git ref (tag/branch); defaults to the latest tag")
+@click.option("--data", "data_pairs", multiple=True,
+              help="Answer as KEY=VALUE (repeatable); unanswered questions prompt interactively")
+def new(destination, template, vcs_ref, data_pairs):
+    """Scaffold a new connector project from the official template."""
+    try:
+        import copier
+    except ImportError:
+        raise click.UsageError(
+            "copier is not installed. Install the CLI extras first:\n"
+            "  pip install 'gundi-action-runner[cli]'"
+        )
+    data = {}
+    for pair in data_pairs:
+        key, _, value = pair.partition("=")
+        if value.lower() in ("true", "false"):
+            value = value.lower() == "true"
+        data[key] = value
+    copier.run_copy(
+        template, destination, data=data, vcs_ref=vcs_ref, defaults=True,
+    )
+    click.echo(
+        f"\nProject created at {destination}. Next steps:\n"
+        f"  cd {destination}\n"
+        f"  pip install -e '.[dev]'\n"
+        f"  pytest\n"
+        f"  gundi-runner run --handlers <package>.handlers"
+    )
+
+
 if __name__ == "__main__":
     cli()
