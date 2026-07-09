@@ -78,6 +78,7 @@ def test_new_generates_project_from_local_template(runner, staged_template, tmp_
         [
             "new", str(dst),
             "--template", str(staged_template),
+            "--defaults",
             "--data", "project_name=Acme Tracker",
             "--data", "include_pull=true",
             "--data", "include_webhook=false",
