@@ -46,3 +46,40 @@ def test_generated_project_test_suite_passes(generate_project):
     )
     assert result.returncode == 0, f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
     assert "2 passed" in result.stdout
+
+
+def test_local_dev_stack(generate_project):
+    import yaml
+
+    dst = generate_project()
+    for path in (
+        "local/docker-compose.yml", "local/helpers/create_subscriptions.sh",
+        "local/.env.local.example", "local/.gitignore", "local/LOCAL_DEVELOPMENT.md",
+    ):
+        assert (dst / path).exists(), f"missing {path}"
+
+    compose = yaml.safe_load((dst / "local" / "docker-compose.yml").read_text())
+    assert set(compose["services"]) == {
+        "redis", "pubsub_emulator", "pubsub_topic_initializer", "connector"
+    }
+    connector = compose["services"]["connector"]
+    assert connector["build"]["target"] == "dev"
+    assert any("acme_tracker" in volume for volume in connector["volumes"])
+    assert connector["depends_on"]["pubsub_topic_initializer"]["condition"] == (
+        "service_completed_successfully"
+    )
+
+    helper = (dst / "local" / "helpers" / "create_subscriptions.sh").read_text()
+    assert "http://connector:8080/" in helper
+    assert "local-actions-topic" in helper
+
+    env_example = (dst / "local" / ".env.local.example").read_text()
+    assert "INTEGRATION_TYPE_SLUG=acme_tracker" in env_example
+    assert "PUBSUB_EMULATOR_HOST=pubsub_emulator:8085" in env_example
+    assert "INTEGRATION_COMMANDS_TOPIC=local-actions-topic" in env_example
+
+    dockerfile = (dst / "Dockerfile").read_text()
+    assert "AS dev" in dockerfile and "AS prod" in dockerfile
+    # prod must be the LAST stage so a bare `docker build .` builds production
+    assert dockerfile.rindex("AS prod") > dockerfile.rindex("AS dev")
+    assert "debugpy" in dockerfile
