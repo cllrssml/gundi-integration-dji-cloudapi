@@ -755,6 +755,7 @@ def test_new_generates_project_from_local_template(runner, staged_template, tmp_
         [
             "new", str(dst),
             "--template", str(staged_template),
+            "--defaults",
             "--data", "project_name=Acme Tracker",
             "--data", "include_pull=true",
             "--data", "include_webhook=false",
@@ -800,7 +801,11 @@ DEFAULT_TEMPLATE = "gh:PADAS/gundi-integration-action-runner"
               help="Template git ref (tag/branch); defaults to the latest tag")
 @click.option("--data", "data_pairs", multiple=True,
               help="Answer as KEY=VALUE (repeatable); unanswered questions prompt interactively")
-def new(destination, template, vcs_ref, data_pairs):
+@click.option("--defaults", is_flag=True, default=False,
+              help="Fill unanswered questions with their defaults instead of prompting "
+                   "(recommended for CI/scripted use; incomplete answers without this flag "
+                   "in a non-TTY produce a broken scaffold — copier does not error)")
+def new(destination, template, vcs_ref, data_pairs, defaults):
     """Scaffold a new connector project from the official template."""
     try:
         import copier
@@ -816,7 +821,7 @@ def new(destination, template, vcs_ref, data_pairs):
             value = value.lower() == "true"
         data[key] = value
     copier.run_copy(
-        template, destination, data=data, vcs_ref=vcs_ref,
+        template, destination, data=data, vcs_ref=vcs_ref, defaults=defaults,
     )
     click.echo(
         f"\nProject created at {destination}. Next steps:\n"
