@@ -10,6 +10,10 @@
    - Environment name: `pypi`
 2. **GitHub environment**: repo Settings → Environments → create `pypi`.
    Optionally add required reviewers to gate publishes behind an approval.
+3. **GitHub Pages**: repo Settings → Pages → Build and deployment → Source:
+   **GitHub Actions**. The `Docs` workflow then deploys the site to
+   https://padas.github.io/gundi-integration-action-runner/ on every push to
+   `main` that touches `docs/` or `mkdocs.yml`.
 
 ## Every release
 
