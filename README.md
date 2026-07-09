@@ -36,9 +36,10 @@ app = create_app(handlers_modules=["myconnector.handlers"])
 ```
 
 Existing forks are unaffected: `app/*` modules remain as compatibility shims
-(emitting `DeprecationWarning`), and `uvicorn app.main:app` still works. See
-`examples/reference_connector/` for a complete example and
-`docs/superpowers/specs/2026-07-07-action-runner-library-design.md` for the design.
+(emitting `DeprecationWarning`), and `uvicorn app.main:app` still works.
+See `examples/reference_connector/` for a complete example, the
+[quickstart](docs/quickstart.md), [extension API reference](docs/extension-api.md),
+and the [fork migration guide](docs/fork-migration.md).
 
 Maintainers: see `RELEASING.md` for how releases are cut and the one-time
 PyPI trusted-publishing setup.
