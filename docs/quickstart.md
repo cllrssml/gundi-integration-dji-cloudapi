@@ -39,7 +39,7 @@ gundi-runner run --handlers <package>.handlers
 ## Add another action
 
 ```bash
-gundi-runner add-action   # prompts for type, id, title, schedule
+gundi-runner add-action   # --type and --id prompt interactively; pass --title/--crontab to set them (they default to empty)
 ```
 
 ## Register in Gundi
