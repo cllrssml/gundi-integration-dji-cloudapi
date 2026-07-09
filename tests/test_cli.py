@@ -103,3 +103,54 @@ def test_new_requires_copier(runner, mocker, tmp_path):
     result = runner.invoke(cli, ["new", str(tmp_path / "x")])
     assert result.exit_code != 0
     assert "pip install 'gundi-action-runner[cli]'" in result.output
+
+
+@pytest.fixture
+def scaffolded_project(generate_project, monkeypatch):
+    dst = generate_project()
+    monkeypatch.chdir(dst)
+    return dst
+
+
+def test_add_action_appends_pull_stub(runner, scaffolded_project):
+    result = runner.invoke(
+        cli,
+        ["add-action", "--type", "pull", "--id", "pull_events",
+         "--title", "Pull Events", "--crontab", "0 */2 * * *"],
+    )
+    assert result.exit_code == 0, result.output
+    handlers = (scaffolded_project / "acme_tracker" / "handlers.py").read_text()
+    configurations = (scaffolded_project / "acme_tracker" / "configurations.py").read_text()
+    assert '@action.pull(config=PullEventsConfig, title="Pull Events")' in handlers
+    assert '@crontab_schedule("0 */2 * * *")' in handlers
+    assert "async def pull_events(integration, action_config):" in handlers
+    assert "class PullEventsConfig(PullActionConfiguration):" in configurations
+    # Still valid python
+    compile(handlers, "handlers.py", "exec")
+    compile(configurations, "configurations.py", "exec")
+
+
+def test_add_action_push_generates_data_model(runner, scaffolded_project):
+    result = runner.invoke(
+        cli, ["add-action", "--type", "push", "--id", "push_positions"]
+    )
+    assert result.exit_code == 0, result.output
+    handlers = (scaffolded_project / "acme_tracker" / "handlers.py").read_text()
+    configurations = (scaffolded_project / "acme_tracker" / "configurations.py").read_text()
+    assert "data: PushPositionsData" in handlers
+    assert "class PushPositionsData(pydantic.BaseModel):" in configurations
+
+
+def test_add_action_refuses_duplicate_id(runner, scaffolded_project):
+    result = runner.invoke(
+        cli, ["add-action", "--type", "pull", "--id", "pull_observations"]
+    )
+    assert result.exit_code != 0
+    assert "already defines" in result.output
+
+
+def test_add_action_refuses_outside_project(runner, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(cli, ["add-action", "--type", "auth", "--id", "auth2"])
+    assert result.exit_code != 0
+    assert "Could not locate" in result.output

@@ -124,5 +124,114 @@ def new(destination, template, vcs_ref, data_pairs, defaults):
     )
 
 
+_CONFIG_BASES = {
+    "auth": "AuthActionConfiguration",
+    "pull": "PullActionConfiguration",
+    "push": "PushActionConfiguration",
+    "generic": "GenericActionConfiguration",
+}
+
+
+def _find_package_dir(explicit):
+    import pathlib
+
+    if explicit:
+        pkg = pathlib.Path(explicit)
+        if not (pkg / "handlers.py").exists() or not (pkg / "configurations.py").exists():
+            raise click.UsageError(
+                f"Could not locate handlers.py + configurations.py under {pkg}."
+            )
+        return pkg
+    candidates = [
+        d for d in pathlib.Path(".").iterdir()
+        if d.is_dir() and not d.name.startswith((".", "_"))
+        and (d / "handlers.py").exists() and (d / "configurations.py").exists()
+    ]
+    if len(candidates) != 1:
+        raise click.UsageError(
+            "Could not locate a connector package (a directory containing "
+            "handlers.py and configurations.py). Run from your project root "
+            "or pass --package."
+        )
+    return candidates[0]
+
+
+def _class_name(action_id, suffix):
+    return "".join(part.capitalize() for part in action_id.split("_")) + suffix
+
+
+@cli.command("add-action")
+@click.option("--type", "action_type", type=click.Choice(list(_CONFIG_BASES)),
+              prompt="Action type")
+@click.option("--id", "action_id", prompt="Action id (snake_case)",
+              callback=lambda ctx, param, value: value.strip())
+@click.option("--title", default="", help="Display name shown in the Gundi portal")
+@click.option("--crontab", default="",
+              help="Crontab schedule (pull actions only), e.g. '*/15 * * * *'")
+@click.option("--package", "package_dir", default=None,
+              help="Connector package directory (auto-detected by default)")
+def add_action(action_type, action_id, title, crontab, package_dir):
+    """Append a stub handler + config class to your connector."""
+    if not action_id.isidentifier() or action_id.lower() != action_id:
+        raise click.UsageError(f"'{action_id}' is not a valid snake_case identifier.")
+    pkg = _find_package_dir(package_dir)
+    handlers_path, config_path = pkg / "handlers.py", pkg / "configurations.py"
+    handlers_src = handlers_path.read_text()
+    if f"def {action_id}(" in handlers_src:
+        raise click.UsageError(f"{handlers_path} already defines '{action_id}'.")
+
+    config_cls = _class_name(action_id, "Config")
+    base = _CONFIG_BASES[action_type]
+    config_block = (
+        f"\n\nclass {config_cls}({base}):\n"
+        f"    # Add configuration fields (FieldWithUIOptions) here.\n"
+        f"    pass\n"
+    )
+    imports = [f"from gundi_action_runner.actions.core import {base}"]
+    if action_type == "push":
+        data_cls = _class_name(action_id, "Data")
+        config_block += (
+            f"\n\nclass {data_cls}(pydantic.BaseModel):\n"
+            f"    # Shape of the data this push action receives.\n"
+            f"    pass\n"
+        )
+        imports.append("import pydantic")
+
+    title_arg = f', title="{title}"' if title else ""
+    handler_lines = [
+        "",
+        "",
+        f"from .configurations import {config_cls}" + (
+            f", {_class_name(action_id, 'Data')}" if action_type == "push" else ""
+        ),
+    ]
+    if crontab:
+        handler_lines.append("from gundi_action_runner.services.action_scheduler import crontab_schedule")
+    handler_lines.append("")
+    handler_lines.append(f"@action.{action_type}(config={config_cls}{title_arg})")
+    if crontab:
+        handler_lines.append(f'@crontab_schedule("{crontab}")')
+    if action_type == "push":
+        handler_lines.append(
+            f"async def {action_id}(integration, action_config, "
+            f"data: {_class_name(action_id, 'Data')}, metadata):"
+        )
+    else:
+        handler_lines.append(f"async def {action_id}(integration, action_config):")
+    handler_lines.append("    # Implement the action; return a summary dict.")
+    handler_lines.append("    return {}")
+    handler_lines.append("")
+
+    config_src = config_path.read_text()
+    import_lines = "\n".join(i for i in imports if i not in config_src)
+    config_path.write_text(
+        config_src.rstrip("\n") + "\n"
+        + (("\n" + import_lines + "\n") if import_lines else "")
+        + config_block
+    )
+    handlers_path.write_text(handlers_src.rstrip("\n") + "\n" + "\n".join(handler_lines))
+    click.echo(f"Added '{action_id}' ({action_type}) to {handlers_path} and {config_path}.")
+
+
 if __name__ == "__main__":
     cli()
