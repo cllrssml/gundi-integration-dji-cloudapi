@@ -13,7 +13,9 @@ loop back into the runner.
 From this `local/` directory:
 
 1. Copy `.env.local.example` to `.env.local`.
-2. Set `KEYCLOAK_CLIENT_SECRET` to a stage secret (ask the Gundi team).
+2. Set `GUNDI_USERNAME` / `GUNDI_PASSWORD` to your own stage Gundi login
+   (default — no client secret needed), or switch to the service-client
+   option in the file if the Gundi team issued you a client secret.
 3. `docker compose up --build`
 
 Then open http://localhost:8080/docs for the connector's browsable API.

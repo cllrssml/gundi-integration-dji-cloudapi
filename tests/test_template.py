@@ -78,6 +78,15 @@ def test_local_dev_stack(generate_project):
     assert "PUBSUB_EMULATOR_HOST=pubsub_emulator:8085" in env_example
     assert "INTEGRATION_COMMANDS_TOPIC=local-actions-topic" in env_example
 
+    # Dual-mode auth: personal login default, OAUTH_* names only
+    assert "GUNDI_USERNAME=" in env_example
+    assert "GUNDI_PASSWORD=" in env_example
+    assert 'OAUTH_CLIENT_ID="cdip-oauth2"' in env_example
+    assert "KEYCLOAK_" not in env_example
+    root_env = (dst / ".env.example").read_text()
+    assert "OAUTH_CLIENT_ID=" in root_env
+    assert "KEYCLOAK_" not in root_env
+
     dockerfile = (dst / "Dockerfile").read_text()
     assert "AS dev" in dockerfile and "AS prod" in dockerfile
     # prod must be the LAST stage so a bare `docker build .` builds production

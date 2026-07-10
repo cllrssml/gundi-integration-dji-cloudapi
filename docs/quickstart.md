@@ -48,7 +48,7 @@ See the generated `local/LOCAL_DEVELOPMENT.md` for setup; in short:
 
 ```bash
 cd local
-cp .env.local.example .env.local   # then set KEYCLOAK_CLIENT_SECRET
+cp .env.local.example .env.local   # then set GUNDI_USERNAME / GUNDI_PASSWORD
 docker compose up --build
 ```
 
@@ -58,10 +58,27 @@ docker compose up --build
 gundi-runner add-action   # --type and --id prompt interactively; pass --title/--crontab to set them (they default to empty)
 ```
 
+## Authenticating with Gundi
+
+All runner↔Gundi calls (including `gundi-runner register`) authenticate
+through the same client, in one of two modes:
+
+- **Personal login (easiest for local dev):** set `GUNDI_USERNAME` and
+  `GUNDI_PASSWORD` to your stage Gundi login, with
+  `OAUTH_CLIENT_ID="cdip-oauth2"` (a public client — no secret needed).
+  Operations run with **your** account's permissions; a 403 (for example on
+  registration) means your account lacks that permission, not that something
+  is broken.
+- **Service client:** set `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` to a
+  credential issued by the Gundi team.
+
+When user credentials are present the client selects the OAuth2 password
+grant automatically; otherwise it uses the client-credentials grant.
+
 ## Register in Gundi
 
 ```bash
-export GUNDI_API_BASE_URL=... KEYCLOAK_CLIENT_ID=... KEYCLOAK_CLIENT_SECRET=...
+export GUNDI_API_BASE_URL=... GUNDI_USERNAME=... GUNDI_PASSWORD=... OAUTH_CLIENT_ID=cdip-oauth2
 gundi-runner register --slug my_connector --name "My Connector" \
   --handlers <package>.handlers --schedule "pull_observations:0 */4 * * *"
 ```
