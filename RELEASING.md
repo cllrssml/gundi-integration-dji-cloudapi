@@ -35,6 +35,31 @@
   (official template) checks out the tag matching the installed library
   version, so `vX.Y.Z` must exist for scaffolding to work at that version.
 
+## Pre-releases (publishing without merging to main)
+
+Tags are branch-independent: the publish workflow fires on any `v*` tag push,
+regardless of which branch the commit lives on. To publish an early release
+from a feature branch without touching `main`:
+
+1. On the branch, bump `__version__` to a PEP 440 pre-release, e.g.
+   `0.1.0rc1` (rc/a/b — NOT `.devN`, which the workflow refuses on purpose).
+2. Commit, then tag and push the tag:
+
+   ```bash
+   git tag v0.1.0rc1
+   git push origin v0.1.0rc1
+   ```
+
+Pre-release behavior to know:
+
+- `pip install gundi-action-runner` ignores pre-releases — testers opt in with
+  `pip install --pre "gundi-action-runner[cli]"` or an exact `==0.1.0rc1` pin.
+  This also means scaffolded projects' `~=0.1` pin resolves nothing until the
+  final `0.1.0`; test-drive scaffolds with `pip install --pre -e ".[dev]"`.
+- The rc tag doubles as the scaffold template ref, so `gundi-runner new`'s
+  default template path works as soon as the tag exists — no merge needed.
+- PyPI releases are immutable: a broken `rc1` stays visible; just cut `rc2`.
+
 ## Versioning
 
 Semver; stay on `0.x` while the extension API settles. Between releases the
