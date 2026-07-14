@@ -162,7 +162,13 @@ def push_gundi(sn, st, message):
         return
     try:
         r = gundi_session.post(GUNDI_URL, json=body, timeout=10)
-        if r.status_code not in (200, 201):
+        if r.status_code in (200, 201):
+            st["gundi_posted"] = st.get("gundi_posted", 0) + 1
+            n = st["gundi_posted"]
+            if n <= 3 or n % 20 == 0:
+                print(f"  gundi #{n} {sn} lat={st['lat']:.6f} lon={st['lon']:.6f} "
+                      f"h={st.get('height')} gps={st.get('gps')}")
+        else:
             print(f"  gundi push failed {sn}: {r.status_code} {r.text[:120]}")
     except Exception as e:
         print(f"  gundi push error {sn}: {e}")
