@@ -1,0 +1,25 @@
+# Minimal DJI Cloud API Pilot-to-Cloud platform for the Phase-0 spike.
+# nginx (443, HTTPS login page) + mosquitto (8883, MQTTS).
+# The Let's Encrypt cert is obtained by setup.sh (certbot standalone) BEFORE `up`.
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"   # HTTPS login page Pilot 2 loads
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./login.html:/usr/share/nginx/html/login.html:ro
+      - ./certs:/etc/letsencrypt:ro
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    user: "0:0"   # run as root so it can read the 0600 root passwd + LE privkey
+    restart: unless-stopped
+    ports:
+      - "8883:8883"                 # MQTTS, exposed to the RC
+      - "127.0.0.1:1883:1883"       # plaintext, LOCAL ONLY (capture_osd.py taps this)
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/passwd:/mosquitto/config/passwd:ro
+      - ./certs:/etc/letsencrypt:ro

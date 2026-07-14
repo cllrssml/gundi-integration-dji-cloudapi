@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ER Live Telemetry — DJI Cloud API</title>
+    <style>
+      .button-row { display: flex; justify-content: space-between; }
+      button { flex: 1; margin: 0 5px; }
+    </style>
+  </head>
+  <body>
+    <h1>ER Live Telemetry — DJI Cloud API</h1>
+    <div class="button-row">
+      <button id="login-button">Login</button>
+      <button id="logout-button">Logout</button>
+      <button id="raport-button">Report</button>
+    </div>
+    <ul id="logs"></ul>
+    <script>
+      // === YOUR DJI Cloud API app credentials (from developer.dji.com) ===
+      // APP_ID is a NUMBER, APP_KEY and LICENSE are strings. Replace all three.
+      const APP_ID = __DJI_APP_ID__;              // e.g. 123456
+      const APP_KEY = "__DJI_APP_KEY__";
+      const LICENSE = "__DJI_APP_LICENSE__";       // long base64 string from the activation email
+
+      // === Broker connection Pilot 2 will use (TLS) ===
+      // __DOMAIN__ is your DuckDNS host; broker creds match mosquitto's password file.
+      const MQTT_HOST = "ssl://__DOMAIN__:8883";
+      const MQTT_USER = "__MQTT_USER__";
+      const MQTT_PASS = "__MQTT_PASS__";
+      // Registering a workspace + platform makes Pilot 2 treat this as a persistent
+      // Cloud Service, so the MQTT link survives leaving this page (telemetry keeps
+      // flowing during flight). A fixed UUID is fine for a single-platform setup.
+      const WORKSPACE_ID = "97dffb09-5c1e-45fe-955f-48381b90ed3b";
+
+      var fieldList = document.getElementById("logs");
+      var log = function (msg) {
+        var li = document.createElement("li");
+        li.innerText = msg;
+        fieldList.appendChild(li);
+      };
+      var reg_calback = function () {
+        log("Callback 🎉 args: " + Array.from(arguments));
+      };
+
+      document.getElementById("login-button").addEventListener("click", function () {
+        log("login");
+        window.djiBridge.platformVerifyLicense(APP_ID, APP_KEY, LICENSE);
+        log("platform is verified: " + window.djiBridge.platformIsVerified());
+        var register_params = JSON.stringify({
+          host: MQTT_HOST,
+          connectCallback: "reg_calback",
+          username: MQTT_USER,
+          password: MQTT_PASS,
+        });
+        log("Load Component thing: " +
+            window.djiBridge.platformLoadComponent("thing", register_params) +
+            " | State: " + window.djiBridge.thingGetConnectState());
+        // --- persistence: register workspace + platform so the connection survives
+        //     leaving this page (cloud icon stays active during flight) ---
+        window.djiBridge.platformSetWorkspaceId(WORKSPACE_ID);
+        window.djiBridge.platformSetInformation(
+          "ER Live Telemetry", "CFW", "DJI to EarthRanger live telemetry");
+        log("registered platform (persistent): ws=" + WORKSPACE_ID);
+        log("thingConnect: " +
+            window.djiBridge.thingConnect(MQTT_USER, MQTT_PASS, "reg_calback"));
+        log("Thing connect state: " + window.djiBridge.thingGetConnectState());
+      });
+
+      document.getElementById("logout-button").addEventListener("click", function () {
+        log("unregistering: " + window.djiBridge.platformUnloadComponent("thing"));
+      });
+
+      document.getElementById("raport-button").addEventListener("click", function () {
+        log("component loaded: " + window.djiBridge.platformIsComponentLoaded("thing") +
+            " | thing state " + window.djiBridge.thingGetConnectState());
+      });
+
+      log("platform is verified: " + window.djiBridge.platformIsVerified());
+    </script>
+  </body>
+</html>

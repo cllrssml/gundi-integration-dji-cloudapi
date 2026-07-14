@@ -1,0 +1,47 @@
+[
+  {
+    "device_sn": "MOCK5F1DJ34T000000A1",
+    "model_name": "DJI Mavic 3T",
+    "recorded_at": "2026-07-12T10:10:48.045000+00:00",
+    "latitude": -21.401153638547165,
+    "longitude": 28.340260079564025,
+    "height": 641.366943359375,
+    "elevation": 0,
+    "gps": 14,
+    "horizontal_speed": 0.1,
+    "vertical_speed": 0,
+    "attitude_head": -45.3,
+    "mode_code": 0,
+    "battery": 95
+  },
+  {
+    "device_sn": "MOCK5F1DJ34T000000A1",
+    "model_name": "DJI Mavic 3T",
+    "recorded_at": "2026-07-12T10:14:29.372000+00:00",
+    "latitude": -21.40116960490916,
+    "longitude": 28.340257094052585,
+    "height": 641.4437866210938,
+    "elevation": 0,
+    "gps": 17,
+    "horizontal_speed": 0.1,
+    "vertical_speed": 0,
+    "attitude_head": -45.3,
+    "mode_code": 0,
+    "battery": 93
+  },
+  {
+    "device_sn": "MOCK5F1DJ34T000000A1",
+    "model_name": "DJI Mavic 3T",
+    "recorded_at": "2026-07-12T10:24:57.377000+00:00",
+    "latitude": -21.401177601055015,
+    "longitude": 28.340247434781183,
+    "height": 641.6242065429688,
+    "elevation": 355.2,
+    "gps": 20,
+    "horizontal_speed": 0.1,
+    "vertical_speed": 0,
+    "attitude_head": -44.5,
+    "mode_code": 0,
+    "battery": 87
+  }
+]

@@ -1,0 +1,19 @@
+# systemd unit for the OSD forwarder. Install:
+#   sudo cp osd-forwarder.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now osd-forwarder
+# Logs: journalctl -u osd-forwarder -f
+[Unit]
+Description=DJI Pilot-to-Cloud OSD forwarder (MQTT -> Gundi)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+EnvironmentFile=/etc/osd-forwarder.env
+ExecStart=/usr/bin/python3 /opt/osd-forwarder/osd_forwarder.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
