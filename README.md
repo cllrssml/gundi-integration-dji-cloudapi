@@ -2,9 +2,9 @@
 
 **Live DJI Enterprise drone telemetry → [Gundi](https://www.earthranger.com/) → EarthRanger** — no Dock, no fleet-management subscription.
 
-Any DJI Enterprise aircraft flown with **DJI Pilot 2** (Mavic 3E/3T, Matrice 30/300/350, …) can stream its position to a self-hosted platform over MQTT using DJI's [Cloud API "Pilot-to-Cloud"](https://developer.dji.com/doc/cloud-api-tutorial/en/) protocol. This integration turns that stream into Gundi observations, so a drone appears in EarthRanger as a live tracked subject — alongside rangers, vehicles, and wildlife.
+We fly a DJI Mavic 3T with an RC Pro at our sanctuary — handheld, no Dock — and wanted the drone visible live in EarthRanger next to our rangers and vehicles. We couldn't find an existing route for that setup, so we built one: any DJI Enterprise aircraft flown with **DJI Pilot 2** (Mavic 3E/3T, Matrice 30/300/350, …) can stream its position to a self-hosted platform over MQTT using DJI's [Cloud API "Pilot-to-Cloud"](https://developer.dji.com/doc/cloud-api-tutorial/en/) protocol. This integration turns that stream into Gundi observations, so the drone appears in EarthRanger as a live tracked subject.
 
-Built from PADAS's [gundi-integration-action-runner](https://github.com/PADAS/gundi-integration-action-runner) template (framework docs preserved at [docs/ACTION_RUNNER.md](docs/ACTION_RUNNER.md)). A reference deployment runs in production at a rhino sanctuary in South Africa.
+We're sharing it in case it's useful to other reserves flying the same kind of setup, or to the Gundi/PADAS team. We tried to follow their conventions as closely as we could — it's built from PADAS's [gundi-integration-action-runner](https://github.com/PADAS/gundi-integration-action-runner) template (framework docs preserved at [docs/ACTION_RUNNER.md](docs/ACTION_RUNNER.md)) — but we hold it lightly; PADAS knows far better than we do what belongs in Gundi. Take it, adapt it, or leave it — no expectations either way. It's running in production at our rhino sanctuary in South Africa right now.
 
 ## Architecture
 
@@ -58,7 +58,8 @@ Connector configuration (set per integration in the Gundi portal): `subject_type
 
 - ✅ Webhook handler, payload schema, and tests (fixtures derived from real Mavic 3T flight captures)
 - ✅ Reserve-side reference stack, field-proven: platform deploy (nginx + Mosquitto + Let's Encrypt via docker-compose), forwarder, systemd units
-- ⏳ Pending registration/deployment as an official Gundi integration type (`dji_cloudapi`). Until then, the forwarder can push the same fixes to Gundi's self-service [Sensors API v2](https://support.earthranger.com/developer_docs/gundi-api) (`GUNDI_MODE=sensors`, the default) using any push connection's API key — same data, same result in EarthRanger.
+- ✅ Running in production today via Gundi's self-service [Sensors API v2](https://support.earthranger.com/developer_docs/gundi-api) (`GUNDI_MODE=sensors`, the default) — any push connection's API key works, no special registration needed.
+- This repo also implements the `webhook_handler` shape so it's ready to run as its own integration type (`dji_cloudapi`) behind `hooks.gundiservice.org`, should that ever be worth PADAS's time to deploy. Entirely their call — the Sensors API path already delivers the same data to EarthRanger either way.
 
 ## Reserve-side setup (summary)
 

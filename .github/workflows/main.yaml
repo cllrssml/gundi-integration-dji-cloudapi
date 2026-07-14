@@ -2,10 +2,10 @@
 #
 # The upstream template's build/deploy jobs (docker build to
 # us-central1-docker.pkg.dev/cdip-78ca/gundi-integrations + terragrunt image
-# bumps in PADAS/gundi-integrations-v2-infra) are intentionally disabled here --
-# they require PADAS org workload-identity vars and deploy keys. Restore them
-# from the upstream template when this integration is adopted into the PADAS
-# org: https://github.com/PADAS/gundi-integration-action-runner
+# bumps in PADAS/gundi-integrations-v2-infra) are disabled here -- they need
+# PADAS org workload-identity vars and deploy keys we don't have. If PADAS
+# ever wants to run this as its own integration type, those jobs can be
+# restored from the upstream template: https://github.com/PADAS/gundi-integration-action-runner
 name: Build integration
 on:
   workflow_dispatch:
