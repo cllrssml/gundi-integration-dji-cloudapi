@@ -43,6 +43,9 @@ sudo docker run --rm -p 80:80 -v "$PWD/certs:/etc/letsencrypt" certbot/certbot \
   --non-interactive --agree-tos --register-unsafely-without-email
 
 echo "== 4/6 Fill templates (secrets stay on this VM only) =="
+# The login page publicly embeds the broker credentials (required by the DJI
+# JSBridge flow), so it is served from a secret random path only.
+export LOGIN_SECRET="${LOGIN_SECRET:-$(openssl rand -hex 8)}"
 cp login.html login.deployed.html
 for f in login.deployed.html nginx.conf mosquitto.conf; do
   perl -pi -e 's/__DOMAIN__/$ENV{DOMAIN}/g;
@@ -50,7 +53,8 @@ for f in login.deployed.html nginx.conf mosquitto.conf; do
                s/__DJI_APP_KEY__/$ENV{DJI_APP_KEY}/g;
                s/__DJI_APP_LICENSE__/$ENV{DJI_APP_LICENSE}/g;
                s/__MQTT_USER__/$ENV{MQTT_USER}/g;
-               s/__MQTT_PASS__/$ENV{MQTT_PASS}/g' "$f"
+               s/__MQTT_PASS__/$ENV{MQTT_PASS}/g;
+               s/__LOGIN_SECRET__/$ENV{LOGIN_SECRET}/g' "$f"
 done
 # nginx mounts login.html by name -> use the filled copy
 cp login.deployed.html login.html
@@ -64,7 +68,10 @@ echo "== 6/6 Start platform =="
 sudo docker compose up -d
 sudo docker compose ps
 echo
-echo "DONE. In DJI Pilot 2 -> Cloud Service -> Open Platforms, enter:"
-echo "   https://${DOMAIN}/login"
+umask 077
+echo "https://${DOMAIN}/login-${LOGIN_SECRET}" > ~/login-url.txt
+echo "DONE. In DJI Pilot 2 -> Cloud Service -> Open Platforms, enter the URL"
+echo "saved to ~/login-url.txt (kept out of this output on purpose):"
+echo "   cat ~/login-url.txt"
 echo "Then tap Login. Capture OSD on this VM with:"
 echo "   MQTT_HOST=127.0.0.1 MQTT_PORT=1883 MQTT_TLS=0 MQTT_USERNAME=${MQTT_USER} MQTT_PASSWORD=*** python3 ../capture_osd.py"
