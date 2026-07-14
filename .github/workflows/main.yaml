@@ -8,6 +8,7 @@
 # org: https://github.com/PADAS/gundi-integration-action-runner
 name: Build integration
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
